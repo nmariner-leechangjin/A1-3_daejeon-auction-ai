@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>대전경매 AI</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>대전경매 AI</h1>
+        <p>대전 아파트 경매, 얼마에 써야 할까?</p>
+    </header>
+
+    <main>
+
+        <section class="auction-form">
+
+            <h2>경매 물건 정보 입력</h2>
+
+            <label for="case-number">사건번호</label>
+            <input
+                type="text"
+                id="case-number"
+                placeholder="예: 2026타경12345"
+            >
+
+            <label for="apartment-name">아파트명</label>
+            <input
+                type="text"
+                id="apartment-name"
+                placeholder="예: 한빛아파트"
+            >
+
+            <label for="address">주소</label>
+            <input
+                type="text"
+                id="address"
+                placeholder="예: 대전 유성구 전민동"
+            >
+
+            <label for="appraisal-price">감정가</label>
+            <input
+                type="number"
+                id="appraisal-price"
+                placeholder="예: 400000000"
+            >
+
+            <label for="minimum-price">최저가</label>
+            <input
+                type="number"
+                id="minimum-price"
+                placeholder="예: 280000000"
+            >
+
+            <label for="failed-count">유찰 횟수</label>
+            <input
+                type="number"
+                id="failed-count"
+                placeholder="예: 1"
+            >
+
+            <label for="views">마이옥션 조회수</label>
+            <input
+                type="number"
+                id="views"
+                placeholder="예: 350"
+            >
+
+            <label for="kb-price">KB 시세</label>
+            <input
+                type="number"
+                id="kb-price"
+                placeholder="예: 450000000"
+            >
+
+            <button id="analyze-button">
+                AI 입찰가 분석하기
+            </button>
+
+        </section>
+
+        <section class="result">
+
+            <h2>AI 분석 결과</h2>
+
+            <div id="result-box">
+                아직 분석된 경매 물건이 없습니다.
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="js/app.js"></script>
+
+</body>
+</html>
