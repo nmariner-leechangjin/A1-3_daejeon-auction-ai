@@ -30,35 +30,53 @@ def static_files(path):
 @app.route("/api/recommend", methods=["POST"])
 def recommend():
 
-    data = request.get_json()
-
-    if not data:
-        return jsonify({
-            "error": "분석할 경매 정보가 없습니다."
-        }), 400
-
     try:
+        # JSON 데이터를 안전하게 가져옵니다.
+        data = request.get_json(silent=True)
+
+        if not data:
+            return jsonify({
+                "error": "분석할 경매 정보가 없습니다."
+            }), 400
+
 
         # ---------------------------------------------
         # 입력값
         # ---------------------------------------------
 
-        appraisal_price = float(data.get("appraisal_price") or 0)
-        minimum_price = float(data.get("minimum_price") or 0)
-        kb_price = float(data.get("kb_price") or 0)
+        appraisal_price = float(
+            data.get("appraisal_price") or 0
+        )
 
-        failed_count = int(data.get("failed_count") or 0)
-        views = int(data.get("views") or 0)
+        minimum_price = float(
+            data.get("minimum_price") or 0
+        )
+
+        kb_price = float(
+            data.get("kb_price") or 0
+        )
+
+        failed_count = int(
+            data.get("failed_count") or 0
+        )
+
+        views = int(
+            data.get("views") or 0
+        )
 
 
-        if appraisal_price <= 0 or minimum_price <= 0 or kb_price <= 0:
+        if (
+            appraisal_price <= 0
+            or minimum_price <= 0
+            or kb_price <= 0
+        ):
             return jsonify({
                 "error": "감정가, 최저가, KB시세를 확인해주세요."
             }), 400
 
 
         # ---------------------------------------------
-        # 프로그램 분석값 계산
+        # 프로그램 분석값
         # ---------------------------------------------
 
         appraisal_rate = (
@@ -70,39 +88,44 @@ def recommend():
         ) * 100
 
 
-        # 조회수에 따른 경쟁도
         if views < 200:
+
             competition = "낮음"
             competition_rate = 0
 
         elif views < 500:
+
             competition = "보통"
             competition_rate = 0.02
 
         elif views < 1000:
+
             competition = "높음"
             competition_rate = 0.04
 
         else:
+
             competition = "매우 높음"
             competition_rate = 0.06
 
 
-        # 가격 매력도
         if kb_rate <= 60:
+
             price_attractiveness = "매우 높음"
 
         elif kb_rate <= 70:
+
             price_attractiveness = "높음"
 
         elif kb_rate <= 80:
+
             price_attractiveness = "보통"
 
         else:
+
             price_attractiveness = "낮음"
 
 
-        # 권장 입찰가
         base_bid_price = kb_price * 0.70
 
         recommended_bid = (
@@ -123,10 +146,10 @@ def recommend():
         # ---------------------------------------------
 
         prompt = f"""
-당신은 대전 지역 아파트 경매 분석을 도와주는 AI입니다.
+당신은 대전 지역 아파트 부동산 경매 분석을 도와주는 AI입니다.
 
-사용자가 입력한 정보와 프로그램이 계산한 결과만 사용해서
-초보자도 쉽게 이해할 수 있는 종합 의견을 작성하세요.
+아래에 제공된 정보와 프로그램 계산 결과만 사용하여
+초보자도 이해하기 쉬운 한국어 종합 의견을 작성하세요.
 
 [경매 물건 정보]
 
@@ -138,7 +161,7 @@ def recommend():
 최저가: {minimum_price:,.0f}원
 KB시세: {kb_price:,.0f}원
 
-유찰횟수: {failed_count}회
+유찰 횟수: {failed_count}회
 마이옥션 조회수: {views:,}회
 
 [프로그램 계산 결과]
@@ -153,39 +176,35 @@ KB시세 대비 최저가: {kb_rate:.1f}%
 {low_bid:,.0f}원 ~ {high_bid:,.0f}원
 
 
-다음 형식으로 작성하세요.
+다음 순서로 작성하세요.
 
 1. 가격 측면의 장점
-- 핵심 내용을 2~3개 bullet로 설명
 
 2. 예상 경쟁도
-- 조회수와 프로그램이 계산한 경쟁도를 바탕으로 설명
 
 3. 주의해서 확인해야 할 사항
-- 권리분석
-- 점유관계
-- 관리비
-- 현장 상태
-등 실제 입찰 전에 확인할 내용을 설명
 
 4. 프로그램 권장 입찰 범위
-- {low_bid:,.0f}원 ~ {high_bid:,.0f}원이 계산된 이유를 쉽게 설명
 
 5. 초보 투자자를 위한 최종 의견
-- 이 물건을 숫자만 보고 판단하면 안 되는 이유를 설명
-- 실제 낙찰이나 수익을 보장하지 않는다고 명확히 설명
 
-중요한 작성 규칙:
 
-- 반드시 위에 제공된 숫자를 그대로 사용하세요.
-- None이라는 단어를 사용하지 마세요.
+작성 규칙:
+
+- 각 번호 항목 사이에 빈 줄을 넣으세요.
+- 각 항목의 내용은 2~4개의 짧은 문단으로 작성하세요.
+- 한 문단이 너무 길어지지 않도록 하세요.
+- 제공된 숫자를 정확하게 사용하세요.
+- None이라는 단어를 절대 사용하지 마세요.
 - 제공되지 않은 사실을 만들어내지 마세요.
-- 실제 낙찰 가능성이나 투자 수익을 보장하지 마세요.
-- Markdown 문법을 사용하지 마세요.
-- #, ##, ###, **, ---, * 기호를 사용하지 마세요.
-- 제목은 "1. 가격 측면의 장점"처럼 작성하세요.
-- 각 항목 사이에는 빈 줄을 넣으세요.
-- 한국어로 자연스럽고 읽기 쉽게 작성하세요.
+- 실제 낙찰이나 투자 수익을 보장하지 마세요.
+- 실제 입찰 전 권리분석과 현장 확인이 필요하다고 알려주세요.
+- Markdown 기호를 사용하지 마세요.
+- 별표(*)를 사용하지 마세요.
+- 샵(#)을 사용하지 마세요.
+- 하이픈(-)을 bullet 용도로 사용하지 마세요.
+- 물결표(~) 앞뒤에 백슬래시를 사용하지 마세요.
+- 자연스러운 한국어 문장으로 작성하세요.
 """
 
 
@@ -199,17 +218,35 @@ KB시세 대비 최저가: {kb_rate:.1f}%
         )
 
 
+        result_text = response.text.strip()
+
+
+        if not result_text:
+            return jsonify({
+                "error": "Gemini에서 분석 결과를 받지 못했습니다."
+            }), 500
+
+
         return jsonify({
-            "result": response.text
-        })
+            "result": result_text
+        }), 200
 
 
     except Exception as error:
 
-        print("Gemini API 오류:", error)
+        # Render 로그에서 실제 원인을 확인할 수 있도록 출력
+        print("========================================")
+        print("GEMINI API ERROR")
+        print(type(error).__name__)
+        print(str(error))
+        print("========================================")
+
 
         return jsonify({
-            "error": f"Gemini API 오류: {str(error)}"
+            "error": (
+                "Gemini 분석 중 오류가 발생했습니다: "
+                + str(error)
+            )
         }), 500
 
 
