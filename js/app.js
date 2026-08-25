@@ -1,10 +1,17 @@
 const analyzeButton = document.getElementById("analyze-button");
 const resultBox = document.getElementById("result-box");
+
 const aiOpinionButton =
     document.getElementById("ai-opinion-button");
 
 const aiOpinionBox =
     document.getElementById("ai-opinion-box");
+
+
+// =====================================================
+// 1. 기본 경매 분석
+// =====================================================
+
 analyzeButton.addEventListener("click", function () {
 
     const appraisalPrice =
@@ -43,7 +50,10 @@ analyzeButton.addEventListener("click", function () {
         (minimumPrice / kbPrice) * 100;
 
 
-    // 조회수에 따른 경쟁도와 가중치
+    // =================================================
+    // 2. 조회수에 따른 경쟁도
+    // =================================================
+
     let competition = "";
     let competitionRate = 0;
 
@@ -68,6 +78,10 @@ analyzeButton.addEventListener("click", function () {
         competitionRate = 0.06;
     }
 
+
+    // =================================================
+    // 3. 프로그램 권장 입찰가 계산
+    // =================================================
 
     // KB시세의 70%를 기본 입찰 기준가격으로 설정
     const baseBidPrice =
@@ -94,14 +108,20 @@ analyzeButton.addEventListener("click", function () {
         recommendedBid * 1.02;
 
 
-    // 금액을 원화 형식으로 바꾸는 함수
+    // =================================================
+    // 4. 금액을 원화 형식으로 변환
+    // =================================================
+
     function formatWon(price) {
 
         return Math.round(price).toLocaleString("ko-KR") + "원";
     }
 
 
-    // 가격 매력도 판단
+    // =================================================
+    // 5. 가격 매력도 판단
+    // =================================================
+
     let priceAttractiveness = "";
 
     if (kbRate <= 60) {
@@ -122,7 +142,10 @@ analyzeButton.addEventListener("click", function () {
     }
 
 
-    // 분석 결과 출력
+    // =================================================
+    // 6. 분석 결과 출력
+    // =================================================
+
     resultBox.innerHTML = `
 
         <strong>경매 기초 분석</strong><br><br>
@@ -161,55 +184,98 @@ analyzeButton.addEventListener("click", function () {
         실제 입찰 전 권리분석, 점유관계, 명도비용 등을 별도로 확인해야 합니다.
         </small>
     `;
-        aiOpinionButton.disabled = false;
+
+
+    // 기본 분석이 끝나면 Gemini 버튼 활성화
+    aiOpinionButton.disabled = false;
 });
+
+
+// =====================================================
+// 7. Gemini AI 종합의견
+// =====================================================
+
 aiOpinionButton.addEventListener("click", async () => {
 
-    aiOpinionBox.textContent = "AI가 경매 데이터를 분석하고 있습니다...";
+    aiOpinionBox.textContent =
+        "AI가 경매 데이터를 분석하고 있습니다...";
 
+
+    // 입력 데이터 수집
     const data = {
-        case_number: document.getElementById("case-number").value,
-        apartment_name: document.getElementById("apartment-name").value,
-        address: document.getElementById("address").value,
 
-        appraisal_price: document.getElementById("appraisal-price").value,
-        minimum_price: document.getElementById("minimum-price").value,
-        kb_price: document.getElementById("kb-price").value,
+        case_number:
+            document.getElementById("case-number").value,
 
-        failed_count: document.getElementById("failed-count").value,
-        views: document.getElementById("views").value
+        apartment_name:
+            document.getElementById("apartment-name").value,
+
+        address:
+            document.getElementById("address").value,
+
+        appraisal_price:
+            document.getElementById("appraisal-price").value,
+
+        minimum_price:
+            document.getElementById("minimum-price").value,
+
+        kb_price:
+            document.getElementById("kb-price").value,
+
+        failed_count:
+            document.getElementById("failed-count").value,
+
+        views:
+            document.getElementById("views").value
     };
+
 
     try {
 
-        const response = await fetch("/api/recommend", {
-            method: "POST",
+        // Flask 서버의 Gemini API 호출
+        const response = await fetch(
+            "/api/recommend",
+            {
+                method: "POST",
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-            body: JSON.stringify(data)
-        });
+                body: JSON.stringify(data)
+            }
+        );
 
 
+        // 서버 응답을 JSON으로 변환
         const result = await response.json();
 
 
+        // 서버에서 오류가 발생한 경우
         if (!response.ok) {
+
             throw new Error(
-                result.error || "AI 분석에 실패했습니다."
+                result.error ||
+                "AI 분석에 실패했습니다."
             );
         }
 
 
-        aiOpinionBox.textContent = result.result;
+        // =================================================
+        // Gemini 결과를 읽기 쉽게 표시
+        // 줄바꿈을 HTML <br>로 변환
+        // =================================================
+
+        aiOpinionBox.innerHTML =
+            result.result.replace(/\n/g, "<br>");
 
 
     } catch (error) {
 
+        // 실제 오류 내용을 화면에 표시
         aiOpinionBox.textContent =
-            "AI 분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+            "AI 분석 오류:\n\n" +
+            error.message;
 
         console.error(error);
     }
