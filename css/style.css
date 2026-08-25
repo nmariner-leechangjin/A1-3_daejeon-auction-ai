@@ -112,3 +112,19 @@ button:hover {
         padding: 20px;
     }
 }
+#ai-opinion-button {
+    background-color: #2457a7;
+}
+
+#ai-opinion-button:disabled {
+    background-color: #a9b2bf;
+    cursor: not-allowed;
+}
+
+#ai-opinion-box {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #eef3f9;
+    border-radius: 8px;
+    line-height: 1.7;
+}
