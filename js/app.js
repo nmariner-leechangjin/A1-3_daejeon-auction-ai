@@ -163,3 +163,54 @@ analyzeButton.addEventListener("click", function () {
     `;
         aiOpinionButton.disabled = false;
 });
+aiOpinionButton.addEventListener("click", async () => {
+
+    aiOpinionBox.textContent = "AI가 경매 데이터를 분석하고 있습니다...";
+
+    const data = {
+        case_number: document.getElementById("case-number").value,
+        apartment_name: document.getElementById("apartment-name").value,
+        address: document.getElementById("address").value,
+
+        appraisal_price: document.getElementById("appraisal-price").value,
+        minimum_price: document.getElementById("minimum-price").value,
+        kb_price: document.getElementById("kb-price").value,
+
+        failed_count: document.getElementById("failed-count").value,
+        views: document.getElementById("views").value
+    };
+
+    try {
+
+        const response = await fetch("/api/recommend", {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(data)
+        });
+
+
+        const result = await response.json();
+
+
+        if (!response.ok) {
+            throw new Error(
+                result.error || "AI 분석에 실패했습니다."
+            );
+        }
+
+
+        aiOpinionBox.textContent = result.result;
+
+
+    } catch (error) {
+
+        aiOpinionBox.textContent =
+            "AI 분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+
+        console.error(error);
+    }
+});
