@@ -71,8 +71,26 @@ KB시세 대비 최저가: {data.get('kb_rate')}%
         try:
             client = genai.Client(api_key=api_key)
             configured_model = os.getenv("GEMINI_MODEL", "").strip()
+            discovered_models = []
+            try:
+                for available_model in client.models.list():
+                    model_name = getattr(available_model, "name", "") or ""
+                    actions = getattr(available_model, "supported_actions", None) or []
+                    normalized_name = model_name.removeprefix("models/")
+                    if (
+                        "generateContent" in actions
+                        and "flash" in normalized_name.lower()
+                        and all(word not in normalized_name.lower()
+                                for word in ("image", "live", "tts"))
+                    ):
+                        discovered_models.append(normalized_name)
+                print(f"Gemini Flash models discovered: {len(discovered_models)}")
+            except Exception as error:
+                print(f"Gemini model discovery failed: {type(error).__name__}")
+
             model_candidates = [
                 configured_model,
+                *discovered_models,
                 "gemini-2.5-flash",
                 "gemini-2.5-flash-lite",
                 "gemini-2.0-flash",
