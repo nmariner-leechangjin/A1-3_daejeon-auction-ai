@@ -40,6 +40,7 @@ A1-3_daejeon-auction-ai/
 │   └── recommend.py
 ├── images/
 ├── requirements.txt
+├── vercel.json
 ├── SERVICE_PLAN.md
 ├── README.md
 └── .gitignore
@@ -94,7 +95,7 @@ vercel dev
 3. GEMINI_API_KEY 환경 변수를 추가합니다.
 4. 배포 URL에서 메뉴, 모바일 화면, 기초 분석과 AI 의견을 확인합니다.
 
-**배포 URL:** Vercel 최종 배포 후 기록
+**배포 URL:** https://a1-3-daejeon-auction-ai.vercel.app
 
 ## 테스트 기준
 
