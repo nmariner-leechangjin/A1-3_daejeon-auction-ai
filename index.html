@@ -1,110 +1,90 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>대전경매 AI</title>
-
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="대전 아파트 경매 입찰가를 계산하고 Gemini AI 의견을 제공하는 경매로 내집찬스">
+  <title>경매로 내집찬스</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
+  <header id="home">
+    <nav class="nav" aria-label="주요 메뉴">
+      <a class="brand" href="#home">경매로 내집찬스</a>
+      <div class="nav-links">
+        <a href="#about">서비스 소개</a>
+        <a href="#analysis">입찰가 분석</a>
+        <a href="#guide">이용 안내</a>
+      </div>
+    </nav>
+    <div class="hero">
+      <span class="eyebrow">DAEJEON AUCTION AI</span>
+      <h1>대전 아파트 경매,<br>얼마에 써야 할까요?</h1>
+      <p>시세와 경쟁도를 먼저 계산하고, 필요한 순간에만 AI 의견을 제공합니다.</p>
+      <a class="hero-button" href="#analysis">무료로 분석하기</a>
+    </div>
+  </header>
 
-    <header>
-        <h1>대전경매 AI</h1>
-        <p>대전 아파트 경매, 얼마에 써야 할까?</p>
-    </header>
+  <main>
+    <section id="about" class="section">
+      <div class="section-heading">
+        <span>ABOUT</span>
+        <h2>복잡한 경매 숫자를 한눈에</h2>
+        <p>감정가·최저가·KB시세·유찰 횟수·조회수를 함께 비교해 가격 매력도와 예상 경쟁도를 보여드립니다.</p>
+      </div>
+      <div class="feature-grid">
+        <article><strong>01</strong><h3>가격 비교</h3><p>감정가와 KB시세 대비 최저가 비율을 자동 계산합니다.</p></article>
+        <article><strong>02</strong><h3>입찰 범위</h3><p>시세와 조회수 기반의 참고용 권장 입찰 범위를 제시합니다.</p></article>
+        <article><strong>03</strong><h3>AI 종합의견</h3><p>계산 결과를 바탕으로 Gemini가 초보자 눈높이로 설명합니다.</p></article>
+      </div>
+    </section>
 
-    <main>
+    <section id="analysis" class="section analysis-section">
+      <div class="section-heading">
+        <span>ANALYSIS</span>
+        <h2>경매 물건 정보 입력</h2>
+        <p><b>*</b> 표시 항목은 필수입니다. 금액은 원 단위 숫자로 입력하세요.</p>
+      </div>
+      <div class="analysis-grid">
+        <form id="auction-form" class="auction-form" novalidate>
+          <div class="field-grid">
+            <label>사건번호<input type="text" id="case-number" placeholder="예: 2026타경12345" maxlength="30"></label>
+            <label>아파트명<input type="text" id="apartment-name" placeholder="예: 한빛아파트" maxlength="50"></label>
+            <label class="wide">주소<input type="text" id="address" placeholder="예: 대전 유성구 전민동" maxlength="100"></label>
+            <label>감정가 <b>*</b><input type="number" id="appraisal-price" placeholder="예: 400000000" min="1" required></label>
+            <label>최저가 <b>*</b><input type="number" id="minimum-price" placeholder="예: 280000000" min="1" required></label>
+            <label>KB시세 <b>*</b><input type="number" id="kb-price" placeholder="예: 450000000" min="1" required></label>
+            <label>유찰 횟수<input type="number" id="failed-count" placeholder="예: 1" min="0" max="20"></label>
+            <label>마이옥션 조회수<input type="number" id="views" placeholder="예: 350" min="0"></label>
+          </div>
+          <p id="form-message" class="message" role="alert" aria-live="polite"></p>
+          <button id="analyze-button" type="submit">입찰가 분석하기</button>
+        </form>
 
-        <section class="auction-form">
+        <div class="result">
+          <h3>분석 결과</h3>
+          <div id="result-box" aria-live="polite">아직 분석된 경매 물건이 없습니다.</div>
+          <button id="ai-opinion-button" type="button" disabled>Gemini AI 종합의견 받기</button>
+          <div id="ai-opinion-box" aria-live="polite">AI 종합의견을 요청하면 이곳에 표시됩니다.</div>
+        </div>
+      </div>
+    </section>
 
-            <h2>경매 물건 정보 입력</h2>
+    <section id="guide" class="section">
+      <div class="section-heading">
+        <span>GUIDE</span>
+        <h2>분석 전에 꼭 확인하세요</h2>
+      </div>
+      <div class="guide-grid">
+        <article><h3>공개정보 입력</h3><p>사건번호와 가격 정보를 확인해 정확히 입력합니다.</p></article>
+        <article><h3>기초 분석 확인</h3><p>가격 매력도와 경쟁도, 권장 범위를 비교합니다.</p></article>
+        <article><h3>AI 의견 요청</h3><p>필요할 때만 AI 버튼을 눌러 비용을 절약합니다.</p></article>
+      </div>
+      <div class="notice"><strong>투자 유의사항</strong><p>분석 결과는 참고자료이며 낙찰이나 수익을 보장하지 않습니다. 입찰 전 등기부등본, 매각물건명세서, 점유관계, 체납관리비와 현장을 반드시 확인하세요.</p></div>
+    </section>
+  </main>
 
-            <label for="case-number">사건번호</label>
-            <input
-                type="text"
-                id="case-number"
-                placeholder="예: 2026타경12345"
-            >
-
-            <label for="apartment-name">아파트명</label>
-            <input
-                type="text"
-                id="apartment-name"
-                placeholder="예: 한빛아파트"
-            >
-
-            <label for="address">주소</label>
-            <input
-                type="text"
-                id="address"
-                placeholder="예: 대전 유성구 전민동"
-            >
-
-            <label for="appraisal-price">감정가</label>
-            <input
-                type="number"
-                id="appraisal-price"
-                placeholder="예: 400000000"
-            >
-
-            <label for="minimum-price">최저가</label>
-            <input
-                type="number"
-                id="minimum-price"
-                placeholder="예: 280000000"
-            >
-
-            <label for="failed-count">유찰 횟수</label>
-            <input
-                type="number"
-                id="failed-count"
-                placeholder="예: 1"
-            >
-
-            <label for="views">마이옥션 조회수</label>
-            <input
-                type="number"
-                id="views"
-                placeholder="예: 350"
-            >
-
-            <label for="kb-price">KB 시세</label>
-            <input
-                type="number"
-                id="kb-price"
-                placeholder="예: 450000000"
-            >
-
-            <button id="analyze-button">
-                AI 입찰가 분석하기
-            </button>
-
-        </section>
-
-        <section class="result">
-
-    <h2>분석 결과</h2>
-
-    <div id="result-box">
-        아직 분석된 경매 물건이 없습니다.
-     </div>
-
-     <button id="ai-opinion-button" disabled>
-        Gemini AI 종합의견 받기
-     </button>
-
-     <div id="ai-opinion-box">
-        AI 종합의견을 요청하면 이곳에 표시됩니다.
-     </div>
-
-     </section>
-
-    </main>
-
-    <script src="js/app.js"></script>
-
+  <footer><p>© 2026 경매로 내집찬스 · 대전 아파트 경매 분석 MVP</p></footer>
+  <script src="js/app.js"></script>
 </body>
 </html>
