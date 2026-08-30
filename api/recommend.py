@@ -70,13 +70,36 @@ KB시세 대비 최저가: {data.get('kb_rate')}%
 """
         try:
             client = genai.Client(api_key=api_key)
-            response = client.models.generate_content(
-                model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
-                contents=prompt,
-            )
-            text = getattr(response, "text", None)
-            if not text:
-                return send_json(self, 502, {"error": "AI 응답이 비어 있습니다. 다시 시도해주세요."})
-            return send_json(self, 200, {"result": text})
-        except Exception:
+            configured_model = os.getenv("GEMINI_MODEL", "").strip()
+            model_candidates = [
+                configured_model,
+                "gemini-2.5-flash",
+                "gemini-2.5-flash-lite",
+                "gemini-2.0-flash",
+                "gemini-2.0-flash-lite",
+            ]
+            model_candidates = list(dict.fromkeys(
+                model for model in model_candidates if model
+            ))
+
+            last_error = None
+            for model in model_candidates:
+                try:
+                    response = client.models.generate_content(
+                        model=model,
+                        contents=prompt,
+                    )
+                    text = getattr(response, "text", None)
+                    if text:
+                        print(f"Gemini model selected: {model}")
+                        return send_json(self, 200, {"result": text})
+                except Exception as error:
+                    last_error = error
+                    print(f"Gemini model unavailable: {model} ({type(error).__name__})")
+
+            if last_error:
+                print(f"All Gemini models failed: {type(last_error).__name__}")
+            return send_json(self, 502, {"error": "사용 가능한 AI 모델을 찾지 못했습니다. 잠시 후 다시 시도해주세요."})
+        except Exception as error:
+            print(f"Gemini client error: {type(error).__name__}")
             return send_json(self, 502, {"error": "AI 서비스 연결에 실패했습니다. 잠시 후 다시 시도해주세요."})
