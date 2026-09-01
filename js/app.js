@@ -88,10 +88,10 @@ aiButton.addEventListener("click",async()=>{
   }
 
   const controller=new AbortController();
-  const timeoutId=setTimeout(()=>controller.abort(),20000);
+  const timeoutId=setTimeout(()=>controller.abort(),60000);
   aiButton.disabled=true;
   aiButton.textContent="AI 분석 중...";
-  aiBox.textContent="AI가 계산 결과를 분석하고 있습니다. 최대 20초 정도 걸릴 수 있습니다.";
+  aiBox.textContent="AI가 계산 결과를 분석하고 있습니다. 최대 60초 정도 걸릴 수 있습니다.";
 
   try{
     const response=await fetch("/api/recommend",{
